@@ -16,7 +16,6 @@ import (
 	"time"
 )
 
-
 func TestGetEnv(t *testing.T) {
 	t.Parallel()
 	assert := assert.New(t)
@@ -35,7 +34,6 @@ func TestGetEnvDefault(t *testing.T) {
 	defaultVal := "default"
 	assert.Equal(defaultVal, getEnv("test", defaultVal))
 }
-
 
 func TestSubscribe(t *testing.T) {
 	assert := assert.New(t)

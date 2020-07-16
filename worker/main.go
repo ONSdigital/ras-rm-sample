@@ -21,7 +21,6 @@ func init() {
 	}
 }
 
-
 func (cw CSVWorker) start() {
 	log.Debug("starting worker process")
 	ctx := context.Background()
@@ -35,7 +34,7 @@ func (cw CSVWorker) start() {
 }
 
 func (cw CSVWorker) subscribe(ctx context.Context, client *pubsub.Client) {
-		subId := getEnv("PUBSUB_SUB_ID", "sample-workers")
+	subId := getEnv("PUBSUB_SUB_ID", "sample-workers")
 	log.WithField("subId", subId).Info("subscribing to subscription")
 	sub := client.Subscription(subId)
 	cctx, cancel := context.WithCancel(ctx)
@@ -64,7 +63,7 @@ func getEnv(key string, defaultVar string) string {
 	v := os.Getenv(key)
 	if v == "" {
 		log.WithFields(log.Fields{
-			"key": key,
+			"key":     key,
 			"default": defaultVar,
 		}).Info("environment variable not set using default")
 		return defaultVar
@@ -84,7 +83,6 @@ func main() {
 		go csvWorker.start()
 	}
 	select {
-		// loop forever
+	// loop forever
 	}
 }
-

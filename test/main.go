@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"os"
 )
+
 /*
 	Simple program that tests sending a message to a topic and setting up a web server to mimic the sample service api
- */
+*/
 func sendCSV() {
 	sample := "13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:"
 	ctx := context.Background()
@@ -67,5 +68,3 @@ func main() {
 	sendCSV()
 	startWebServer()
 }
-
-

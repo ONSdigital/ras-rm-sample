@@ -5,41 +5,40 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"net/http"
 )
 
 type Sample struct {
 	SAMPLEUNITREF string
-	CHECKLETTER string
-	FROSIC92 string
-	RUSIC92 string
-	FROSIC2007 string
-	RUSIC2007 string
-	FROEMPMENT string
-	FROTOVER string
-	ENTREF string
-	LEGALSTATUS string
-	ENTREPMKR string
-	REGION string
-	BIRTHDATE string
-	ENTNAME1 string
-	ENTNAME2 string
-	ENTNAME3 string
-	RUNAME1 string
-	RUNAME2 string
-	RUNAME3 string
-	TRADSTYLE1 string
-	TRADSTYLE2 string
-	TRADSTYLE3 string
-	SELTYPE string
-	INCLEXCL string
-	CELLNO string
-	FORMTYPE string
-	CURRENCY  string
+	CHECKLETTER   string
+	FROSIC92      string
+	RUSIC92       string
+	FROSIC2007    string
+	RUSIC2007     string
+	FROEMPMENT    string
+	FROTOVER      string
+	ENTREF        string
+	LEGALSTATUS   string
+	ENTREPMKR     string
+	REGION        string
+	BIRTHDATE     string
+	ENTNAME1      string
+	ENTNAME2      string
+	ENTNAME3      string
+	RUNAME1       string
+	RUNAME2       string
+	RUNAME3       string
+	TRADSTYLE1    string
+	TRADSTYLE2    string
+	TRADSTYLE3    string
+	SELTYPE       string
+	INCLEXCL      string
+	CELLNO        string
+	FORMTYPE      string
+	CURRENCY      string
 }
-
 
 func processSample(line []byte) error {
 	log.Debug("processing sample")
@@ -114,7 +113,7 @@ func (s Sample) marshall() ([]byte, error) {
 func (s Sample) getSampleServiceUrl() string {
 	sampleServiceBaseUrl := getEnv("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
 	sampleServiceUri := getEnv("SAMPLE_SERVICE_URI", "/samples")
-	sampleServiceUrl :=  sampleServiceBaseUrl + sampleServiceUri
+	sampleServiceUrl := sampleServiceBaseUrl + sampleServiceUri
 	log.WithField("url", sampleServiceUrl).Info("using sample service url")
 	return sampleServiceUrl
 }
@@ -140,5 +139,3 @@ func (s Sample) sendHttpRequest(url string, payload []byte) error {
 		return errors.New("sample not created")
 	}
 }
-
-

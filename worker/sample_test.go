@@ -21,9 +21,9 @@ func TestSampleSuccess(t *testing.T) {
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
 	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", ts.URL)
-	assert.Nil(err,"Failed to set env variable")
+	assert.Nil(err, "Failed to set env variable")
 
-	sample :=  []byte("13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:")
+	sample := []byte("13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:")
 	err = processSample(sample)
 	assert.Nil(err, "error should be nil")
 }
@@ -39,9 +39,9 @@ func TestSampleError(t *testing.T) {
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
 	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", ts.URL)
-	assert.Nil(err,"Failed to set env variable")
+	assert.Nil(err, "Failed to set env variable")
 
-	sample :=  []byte("13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:")
+	sample := []byte("13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:")
 	err = processSample(sample)
 	assert.NotNil(t, err, "error should not be nil")
 }
@@ -157,9 +157,9 @@ func TestSendSampleSuccess(t *testing.T) {
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
 	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", ts.URL)
-	assert.Nil(err,"Failed to set env variable")
+	assert.Nil(err, "Failed to set env variable")
 
-	s :=  createSample()
+	s := createSample()
 	err = s.sendToSampleService()
 	assert.Nil(err, "error should be nil")
 }
