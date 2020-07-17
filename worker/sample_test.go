@@ -7,8 +7,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+
+	// call flag.Parse() here if TestMain uses flags
+	os.Exit(m.Run())
+}
 
 func TestSampleSuccess(t *testing.T) {
 	assert := assert.New(t)
