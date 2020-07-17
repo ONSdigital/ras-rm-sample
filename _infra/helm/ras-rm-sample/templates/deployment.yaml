@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        app:ras-rm-sample-csv-worker
+        app: ras-rm-sample-csv-worker
         env: {{ .Values.env }}
     spec:
       containers:
