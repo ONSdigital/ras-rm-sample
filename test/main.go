@@ -12,6 +12,7 @@ import (
 
 /*
 	Simple program that tests sending a message to a topic and setting up a web server to mimic the sample service api
+	TODO - remove once complete
 */
 func sendCSV() {
 	sample := "13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:"

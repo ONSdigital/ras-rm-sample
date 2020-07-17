@@ -5,7 +5,9 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 )
@@ -44,7 +46,6 @@ func processSample(line []byte) error {
 	log.Debug("processing sample")
 	s := parse(line)
 	return s.sendToSampleService()
-
 }
 
 func parse(line []byte) *Sample {
@@ -86,7 +87,7 @@ func parse(line []byte) *Sample {
 		FORMTYPE:      sample[25],
 		CURRENCY:      sample[26],
 	}
-	log.Debug("sample create")
+	log.WithField("SAMPLEUNITREF", sampleUnit.SAMPLEUNITREF).Debug("sample created")
 	return sampleUnit
 }
 
@@ -111,9 +112,9 @@ func (s Sample) marshall() ([]byte, error) {
 }
 
 func (s Sample) getSampleServiceUrl() string {
-	sampleServiceBaseUrl := getEnv("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
-	sampleServiceUri := getEnv("SAMPLE_SERVICE_URI", "/samples")
-	sampleServiceUrl := sampleServiceBaseUrl + sampleServiceUri
+	sampleServiceBaseUrl := viper.GetString("SAMPLE_SERVICE_BASE_URL")
+	sampleServicePath := viper.GetString("SAMPLE_SERVICE_PATH")
+	sampleServiceUrl := sampleServiceBaseUrl + sampleServicePath
 	log.WithField("url", sampleServiceUrl).Info("using sample service url")
 	return sampleServiceUrl
 }
@@ -136,6 +137,6 @@ func (s Sample) sendHttpRequest(url string, payload []byte) error {
 		return nil
 	} else {
 		log.WithField("status code", resp.StatusCode).Error("sample not created status")
-		return errors.New("sample not created")
+		return errors.New(fmt.Sprintf("sample not created - status code %d", resp.StatusCode))
 	}
 }
