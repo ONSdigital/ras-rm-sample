@@ -14,9 +14,16 @@ type CSVWorker struct {
 
 func init() {
 	// Only log the warning severity or above.
-	if "DEBUG" == getEnv("LOG_LEVEL", "DEBUG") {
+	verbose, err := strconv.ParseBool(getEnv("VERBOSE", "true"))
+	if err != nil {
+		log.Error("unable to parse verbose env")
+		verbose = true
+	}
+	if verbose {
+		//anything debug and above
 		log.SetLevel(log.DebugLevel)
 	} else {
+		//otherwise keep it to info
 		log.SetLevel(log.InfoLevel)
 	}
 }

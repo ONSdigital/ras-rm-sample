@@ -32,7 +32,7 @@ spec:
               value: {{.Values.sample.service.baseUrl}}
             - name: SAMPLE_SERVICE_PATH
               value: {{.Values.sample.service.path}}
-            - name: LOG_LEVEL
-              value: {{.Values.log.level}}
+            - name: VERBOSE
+              value: {{.Values.verbose}}
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

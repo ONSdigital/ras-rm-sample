@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -85,7 +86,7 @@ func parse(line []byte) *Sample {
 		FORMTYPE:      sample[25],
 		CURRENCY:      sample[26],
 	}
-	log.Debug("sample create")
+	log.WithField("SAMPLEUNITREF", sampleUnit.SAMPLEUNITREF).Debug("sample created")
 	return sampleUnit
 }
 
@@ -135,6 +136,6 @@ func (s Sample) sendHttpRequest(url string, payload []byte) error {
 		return nil
 	} else {
 		log.WithField("status code", resp.StatusCode).Error("sample not created status")
-		return errors.New("sample not created")
+		return errors.New(fmt.Sprintf("sample not created - status code %d", resp.StatusCode))
 	}
 }

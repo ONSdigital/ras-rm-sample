@@ -19,5 +19,4 @@ sample:
     baseUrl: http://localhost:8080
     path: /samples
 
-log:
-  level: INFO
+verbose: true
