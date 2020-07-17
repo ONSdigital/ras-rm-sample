@@ -5,6 +5,9 @@ import (
 	"context"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"os"
+
+	//"os"
 )
 
 type CSVWorker struct {
@@ -70,6 +73,7 @@ func setDefaults() {
 }
 
 func main() {
+	log.Info("starting")
 	//config
 	viper.AutomaticEnv()
 	setDefaults()
@@ -79,7 +83,16 @@ func main() {
 		csvWorker := &CSVWorker{}
 		go csvWorker.start()
 	}
-	select {
-	// loop forever
-	}
+
+	signals := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
+	go func() {
+		signal := <-signals
+		log.WithField("signal", signal).Info("kill signal received")
+		done <- true
+	}()
+
+	log.Info("started")
+	<-done
+	log.Info("exiting")
 }

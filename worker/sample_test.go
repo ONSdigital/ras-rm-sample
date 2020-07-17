@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
@@ -20,11 +20,10 @@ func TestSampleSuccess(t *testing.T) {
 	defer ts.Close()
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
-	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", ts.URL)
-	assert.Nil(err, "Failed to set env variable")
+	viper.Set("SAMPLE_SERVICE_BASE_URL", ts.URL)
 
 	sample := []byte("13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:")
-	err = processSample(sample)
+	err := processSample(sample)
 	assert.Nil(err, "error should be nil")
 }
 
@@ -38,28 +37,20 @@ func TestSampleError(t *testing.T) {
 	defer ts.Close()
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
-	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", ts.URL)
-	assert.Nil(err, "Failed to set env variable")
+	viper.Set("SAMPLE_SERVICE_BASE_URL", ts.URL)
 
 	sample := []byte("13110000001:::::::::::WW:::::OFFICE FOR NATIONAL STATISTICS:::::::::0001:")
-	err = processSample(sample)
+	err := processSample(sample)
 	assert.NotNil(t, err, "error should not be nil")
 }
 
 func TestSampleServerURL(t *testing.T) {
 	s := &Sample{}
 	assert := assert.New(t)
-	// test default
-	os.Clearenv()
-	assert.Equal("http://localhost:8080/samples", s.getSampleServiceUrl())
-
 	// set env variables and check url is correct
-	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", "https://127.0.0.1")
-	assert.Nil(err, "error should be nil")
-	err = os.Setenv("SAMPLE_SERVICE_PATH", "/test")
-	assert.Nil(err, "error should be nil")
+	viper.Set("SAMPLE_SERVICE_BASE_URL", "https://127.0.0.1")
+	viper.Set("SAMPLE_SERVICE_PATH", "/test")
 	assert.Equal("https://127.0.0.1/test", s.getSampleServiceUrl())
-
 }
 
 func TestSendHttpRequest(t *testing.T) {
@@ -106,9 +97,24 @@ func TestSendHttpRequestWrongStatus(t *testing.T) {
 	assert.NotNil(err, "error should be nil")
 }
 
+func TestSendSampleSuccess(t *testing.T) {
+	assert := assert.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte("OK"))
+	}))
+	defer ts.Close()
+
+	fmt.Printf("Setting sample service base url %v\n", ts.URL)
+	viper.Set("SAMPLE_SERVICE_BASE_URL", ts.URL)
+
+	s := createSample()
+	err := s.sendToSampleService()
+	assert.Nil(err, "error should be nil")
+}
+
 func TestMarshall(t *testing.T) {
 	t.Parallel()
-
 	assert := assert.New(t)
 	s := createSample()
 
@@ -143,24 +149,6 @@ func TestMarshall(t *testing.T) {
 		"\"CURRENCY\":\"£\"}"
 
 	assert.Equal(sampleJson, string(sample))
-}
-
-func TestSendSampleSuccess(t *testing.T) {
-	t.Parallel()
-	assert := assert.New(t)
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("OK"))
-	}))
-	defer ts.Close()
-
-	fmt.Printf("Setting sample service base url %v", ts.URL)
-	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", ts.URL)
-	assert.Nil(err, "Failed to set env variable")
-
-	s := createSample()
-	err = s.sendToSampleService()
-	assert.Nil(err, "error should be nil")
 }
 
 func TestMarshallEmptyStruct(t *testing.T) {
