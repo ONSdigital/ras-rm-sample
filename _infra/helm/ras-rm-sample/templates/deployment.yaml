@@ -19,28 +19,19 @@ spec:
         app: {{ .Chart.Name }}
         env: {{ .Values.env }}
     spec:
-      volumes:
-      - name: google-cloud-key
-        secret:
-          secretName: google-application-credentials
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.name }}/{{ .Chart.Name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          volumeMounts:
-            - name: google-cloud-key
-              mountPath: /var/secrets/google
           env:
             - name: PUBSUB_TOPIC
               value: sample-jobs
             - name: PUBSUB_SUB_ID
               value: sample-workers
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /var/secrets/google/key.json
             - name: SAMPLE_SERVICE_BASE_URL
               value: {{.Values.sample.service.baseUrl}}
-            - name: SAMPLE_SERVICE_URI
-              value: {{.Values.sample.service.api}}
+            - name: SAMPLE_SERVICE_PATH
+              value: {{.Values.sample.service.path}}
             - name: LOG_LEVEL
               value: {{.Values.log.level}}
           resources:

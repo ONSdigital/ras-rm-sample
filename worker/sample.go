@@ -44,7 +44,6 @@ func processSample(line []byte) error {
 	log.Debug("processing sample")
 	s := parse(line)
 	return s.sendToSampleService()
-
 }
 
 func parse(line []byte) *Sample {
@@ -112,8 +111,8 @@ func (s Sample) marshall() ([]byte, error) {
 
 func (s Sample) getSampleServiceUrl() string {
 	sampleServiceBaseUrl := getEnv("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
-	sampleServiceUri := getEnv("SAMPLE_SERVICE_URI", "/samples")
-	sampleServiceUrl := sampleServiceBaseUrl + sampleServiceUri
+	sampleServicePath := getEnv("SAMPLE_SERVICE_PATH", "/samples")
+	sampleServiceUrl := sampleServiceBaseUrl + sampleServicePath
 	log.WithField("url", sampleServiceUrl).Info("using sample service url")
 	return sampleServiceUrl
 }

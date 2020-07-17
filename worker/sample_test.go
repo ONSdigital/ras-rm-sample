@@ -11,12 +11,12 @@ import (
 )
 
 func TestSampleSuccess(t *testing.T) {
-	t.Parallel()
 	assert := assert.New(t)
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("OK"))
 	}))
+	ts.Start()
 	defer ts.Close()
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
@@ -29,12 +29,12 @@ func TestSampleSuccess(t *testing.T) {
 }
 
 func TestSampleError(t *testing.T) {
-	t.Parallel()
 	assert := assert.New(t)
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("FAILED"))
 	}))
+	ts.Start()
 	defer ts.Close()
 
 	fmt.Printf("Setting sample service base url %v", ts.URL)
@@ -47,41 +47,40 @@ func TestSampleError(t *testing.T) {
 }
 
 func TestSampleServerURL(t *testing.T) {
-	t.Parallel()
 	s := &Sample{}
 	assert := assert.New(t)
 	// test default
+	os.Clearenv()
 	assert.Equal("http://localhost:8080/samples", s.getSampleServiceUrl())
 
 	// set env variables and check url is correct
 	err := os.Setenv("SAMPLE_SERVICE_BASE_URL", "https://127.0.0.1")
 	assert.Nil(err, "error should be nil")
-	err = os.Setenv("SAMPLE_SERVICE_URI", "/test")
+	err = os.Setenv("SAMPLE_SERVICE_PATH", "/test")
 	assert.Nil(err, "error should be nil")
 	assert.Equal("https://127.0.0.1/test", s.getSampleServiceUrl())
 
 }
 
 func TestSendHttpRequest(t *testing.T) {
-	t.Parallel()
 	s := &Sample{}
 	assert := assert.New(t)
 	payload := []byte("TEST")
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		assert.Nil(err)
 		assert.Equal(payload, body)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("OK"))
 	}))
+	ts.Start()
 	defer ts.Close()
 	err := s.sendHttpRequest(ts.URL, payload)
 	assert.Nil(err, "error should be nil")
 }
 
 func TestSendHttpRequestBadUrl(t *testing.T) {
-	t.Parallel()
 	s := &Sample{}
 	assert := assert.New(t)
 	payload := []byte("TEST")
@@ -90,18 +89,18 @@ func TestSendHttpRequestBadUrl(t *testing.T) {
 }
 
 func TestSendHttpRequestWrongStatus(t *testing.T) {
-	t.Parallel()
 	s := &Sample{}
 	assert := assert.New(t)
 	payload := []byte("TEST")
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		assert.Nil(err)
 		assert.Equal(payload, body)
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("OK"))
 	}))
+	ts.Start()
 	defer ts.Close()
 	err := s.sendHttpRequest(ts.URL, payload)
 	assert.NotNil(err, "error should be nil")
