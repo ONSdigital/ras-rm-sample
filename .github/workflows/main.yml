@@ -47,7 +47,7 @@ jobs:
       - name: Build Docker Image
         if: github.ref != 'refs/heads/master'
         run: |
-          cd worker && docker build -f worker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} . && cd ..
+          cd worker && docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} . && cd ..
       - name: Publish Docker Image
         if: github.ref != 'refs/heads/master'
         run: |
