@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app:ras-rm-sample-csv-worker
         env: {{ .Values.env }}
     spec:
       containers:
