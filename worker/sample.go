@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 )
@@ -111,8 +112,8 @@ func (s Sample) marshall() ([]byte, error) {
 }
 
 func (s Sample) getSampleServiceUrl() string {
-	sampleServiceBaseUrl := getEnv("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
-	sampleServicePath := getEnv("SAMPLE_SERVICE_PATH", "/samples")
+	sampleServiceBaseUrl := viper.GetString("SAMPLE_SERVICE_BASE_URL")
+	sampleServicePath := viper.GetString("SAMPLE_SERVICE_PATH")
 	sampleServiceUrl := sampleServiceBaseUrl + sampleServicePath
 	log.WithField("url", sampleServiceUrl).Info("using sample service url")
 	return sampleServiceUrl

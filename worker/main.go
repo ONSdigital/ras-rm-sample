@@ -4,8 +4,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"context"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"strconv"
+	"github.com/spf13/viper"
 )
 
 type CSVWorker struct {
@@ -13,12 +12,7 @@ type CSVWorker struct {
 }
 
 func init() {
-	// Only log the warning severity or above.
-	verbose, err := strconv.ParseBool(getEnv("VERBOSE", "true"))
-	if err != nil {
-		log.Error("unable to parse verbose env")
-		verbose = true
-	}
+	verbose := viper.GetBool("VERBOSE")
 	if verbose {
 		//anything debug and above
 		log.SetLevel(log.DebugLevel)
@@ -31,7 +25,7 @@ func init() {
 func (cw CSVWorker) start() {
 	log.Debug("starting worker process")
 	ctx := context.Background()
-	client, err := pubsub.NewClient(ctx, getEnv("GOOGLE_CLOUD_PROJECT", "rm-ras-sandbox"))
+	client, err := pubsub.NewClient(ctx, viper.GetString("GOOGLE_CLOUD_PROJECT"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +35,7 @@ func (cw CSVWorker) start() {
 }
 
 func (cw CSVWorker) subscribe(ctx context.Context, client *pubsub.Client) {
-	subId := getEnv("PUBSUB_SUB_ID", "sample-workers")
+	subId := viper.GetString("PUBSUB_SUB_ID")
 	log.WithField("subId", subId).Info("subscribing to subscription")
 	sub := client.Subscription(subId)
 	cctx, cancel := context.WithCancel(ctx)
@@ -66,26 +60,22 @@ func (cw CSVWorker) subscribe(ctx context.Context, client *pubsub.Client) {
 	}
 }
 
-func getEnv(key string, defaultVar string) string {
-	v := os.Getenv(key)
-	if v == "" {
-		log.WithFields(log.Fields{
-			"key":     key,
-			"default": defaultVar,
-		}).Info("environment variable not set using default")
-		return defaultVar
-	}
-	return v
+func setDefaults() {
+	viper.SetDefault("PUBSUB_SUB_ID", "sample-workers")
+	viper.SetDefault("GOOGLE_CLOUD_PROJECT", "rm-ras-sandbox")
+	viper.SetDefault("WORKERS", "10")
+	viper.SetDefault("VERBOSE", true)
+	viper.SetDefault("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
+	viper.SetDefault("SAMPLE_SERVICE_PATH", "/samples")
 }
 
 func main() {
-	workers := getEnv("WORKERS", "10")
-	noOfWorkers, err := strconv.Atoi(workers)
-	if err != nil {
-		log.Error("Unable to set number of workers defaulting to 10")
-		noOfWorkers = 10
-	}
-	for i := 0; i < noOfWorkers; i++ {
+	//config
+	viper.AutomaticEnv()
+	setDefaults()
+
+	workers := viper.GetInt("WORKERS")
+	for i := 0; i < workers; i++ {
 		csvWorker := &CSVWorker{}
 		go csvWorker.start()
 	}

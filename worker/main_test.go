@@ -16,25 +16,6 @@ import (
 	"time"
 )
 
-func TestGetEnv(t *testing.T) {
-	t.Parallel()
-	assert := assert.New(t)
-
-	val := "test"
-	os.Setenv("TEST", val)
-	defaultVal := "default"
-	assert.Equal(val, getEnv("TEST", defaultVal))
-	assert.NotEqual(defaultVal, getEnv("TEST", defaultVal))
-}
-
-func TestGetEnvDefault(t *testing.T) {
-	t.Parallel()
-	assert := assert.New(t)
-
-	defaultVal := "default"
-	assert.Equal(defaultVal, getEnv("test", defaultVal))
-}
-
 func TestSubscribe(t *testing.T) {
 	assert := assert.New(t)
 	//create a fake Pub Sub serer
