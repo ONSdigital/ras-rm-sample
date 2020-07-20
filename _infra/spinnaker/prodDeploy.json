@@ -1,6 +1,6 @@
 {
   "schema": "v2",
-  "application": "survey",
+  "application": "ras-rm-sample",
   "name": "deploy prod",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
