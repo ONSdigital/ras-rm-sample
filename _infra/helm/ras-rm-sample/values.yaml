@@ -16,7 +16,7 @@ resources:
 
 sample:
   service:
-    baseUrl: http://localhost:8080
-    path: /samples
+    baseUrl: "http://localhost:8080"
+    path: "/samples"
 
 verbose: true
