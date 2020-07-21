@@ -16,41 +16,6 @@ import (
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
 )
 
-//func TestFileUpload(t *testing.T) {
-//	processor := &FileProcessor{
-//		Config: config.Config{},
-//	}
-//
-//	pr, pw := io.Pipe()
-//	//This writers is going to transform
-//	//what we pass to it to multipart form data
-//	//and write it to our io.Pipe
-//	writer := multipart.NewWriter(pw)
-//
-//	go func() {
-//		defer writer.Close()
-//		//we create the form data field 'fileupload'
-//		//wich returns another writer to write the actual file
-//		part, err := writer.CreateFormFile("file", "sample_test_file.csv")
-//		if err != nil {
-//			t.Error(err)
-//		}
-//
-//		//https://yourbasic.org/golang/create-image/
-//		img := createImage()
-//
-//		//Encode() takes an io.Writer.
-//		//We pass the multipart field
-//		//'fileupload' that we defined
-//		//earlier which, in turn, writes
-//		//to our io.Pipe
-//		err = png.Encode(part, img)
-//		if err != nil {
-//			t.Error(err)
-//		}
-//	}()
-//}
-
 var fileProcessorStub file.FileProcessor
 var ctx = context.Background()
 func init() {
