@@ -10,13 +10,10 @@ import (
 	"path/filepath"
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"cloud.google.com/go/pubsub"
-	"cloud.google.com/go/pubsub/pstest"
-	"google.golang.org/api/option"
-	"google.golang.org/grpc"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/file"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
+	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
 )
 
 //func TestFileUpload(t *testing.T) {
@@ -57,7 +54,7 @@ import (
 var fileProcessorStub file.FileProcessor
 var ctx = context.Background()
 func init() {
-	_, client := createTestPubSubServer("testtopic")
+	_, client := stub.CreateTestPubSubServer("testtopic", ctx)
 	fileProcessorStub = file.FileProcessor{
 		Config: config.Config{
 			Port: "8080",
@@ -69,19 +66,6 @@ func init() {
 		Client: client,
 		Ctx: ctx,
 	}
-}
-
-
-func createTestPubSubServer(topicId string) (*grpc.ClientConn, *pubsub.Client) {
-	// Start a fake server running locally.
-	srv := pstest.NewServer()
-	// Connect to the server without using TLS.
-	conn, _ := grpc.Dial(srv.Addr, grpc.WithInsecure())
-	// Use the connection when creating a pubsub client.
-	client, _ := pubsub.NewClient(ctx, "project", option.WithGRPCConn(conn))
-	topic, _ := client.CreateTopic(ctx, topicId)
-	_ = topic
-	return conn, client
 }
 
 func TestFileUploadSuccess(t *testing.T) {

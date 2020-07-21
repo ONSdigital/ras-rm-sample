@@ -6,14 +6,12 @@ import (
 	"log"
 	"os"
 
-	//"fmt"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
+	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
 	"testing"
-	"cloud.google.com/go/pubsub"
-	"cloud.google.com/go/pubsub/pstest"
-	"google.golang.org/api/option"
-	"google.golang.org/grpc"
 )
+
+var testContext = context.Background()
 
 var fileProcessorStub = &FileProcessor{
 	Config: config.Config{
@@ -24,26 +22,11 @@ var fileProcessorStub = &FileProcessor{
 	    },
 	},
 	Client: nil,
-	Ctx: textContext,
-}
-
-var textContext = context.Background()
-
-func createTestPubSubServer(topicId string) (*grpc.ClientConn, *pubsub.Client) {
-	// Start a fake server running locally.
-	srv := pstest.NewServer()
-	// Connect to the server without using TLS.
-	conn, _ := grpc.Dial(srv.Addr, grpc.WithInsecure())
-	// Use the connection when creating a pubsub client.
-	client, _ := pubsub.NewClient(textContext, "project", option.WithGRPCConn(conn))
-	topic, _ := client.CreateTopic(textContext, topicId)
-	_ = topic
-	return conn, client
+	Ctx: testContext,
 }
 
 func TestScannerAndPublishSuccess(t *testing.T) {
-
-	conn, client := createTestPubSubServer("testtopic")
+	conn, client := stub.CreateTestPubSubServer("testtopic", testContext)
 	defer conn.Close()
 	defer client.Close()
 
@@ -65,7 +48,7 @@ func TestScannerAndPublishSuccess(t *testing.T) {
 }
 
 func TestScannerAndPublishBadTopic(t *testing.T) {
-	conn, client := createTestPubSubServer("badtopic")
+	conn, client := stub.CreateTestPubSubServer("badtopic", testContext)
 	defer conn.Close()
 	defer client.Close()
 
