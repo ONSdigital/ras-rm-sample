@@ -11,6 +11,5 @@ require (
 	github.com/stretchr/testify v1.4.0
 	google.golang.org/api v0.28.0
 	google.golang.org/grpc v1.29.1
-	gopkg.in/yaml.v2 v2.2.4
 	github.com/stretchr/testify v1.6.0
 )

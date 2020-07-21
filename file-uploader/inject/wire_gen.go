@@ -53,7 +53,7 @@ func GenContext() context.Context {
 func NewPubSub(config2 config.Config, ctx context.Context) *pubsub.Client {
 	client, err := pubsub.NewClient(ctx, config2.Pubsub.ProjectId)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.WithError(err).Error("Failed to create pubsub client")
 	}
 	logrus.Info("Pubsub client created")
 	return client

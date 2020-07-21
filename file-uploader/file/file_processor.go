@@ -20,14 +20,7 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 		WithField("filesize", handler.Size).
 		WithField("MIMEHeader", handler.Header).
 		Info("File uploaded")
-
-	scanner := bufio.NewScanner(file)
-	f.Publish(scanner)
-
-	if err := scanner.Err(); err != nil {
-		log.WithError(err).
-			Fatal("Error scanning file")
-	}
+	f.Publish(bufio.NewScanner(file))
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
@@ -41,10 +34,9 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 		errorChannel := make(chan error, 0)
 
 		go func(line string, topic *pubsub.Topic) {
-			result := topic.Publish(f.Ctx, &pubsub.Message{
+			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
-			})
-			id, err := result.Get(f.Ctx)
+			}).Get(f.Ctx)
 			log.WithField("line", line).
 				WithField("messageId", id).
 				Debug("csv line acknowledged")
@@ -58,6 +50,9 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 				WithError(err).
 				Error("Error publishing csv line")
 		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.WithError(err).Error("Error scanning file")
 	}
 	return errorCount
 }

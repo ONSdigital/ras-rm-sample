@@ -29,17 +29,22 @@ var fileProcessorStub = &FileProcessor{
 
 var textContext = context.Background()
 
-func TestScannerAndPublishSuccess(t *testing.T) {
+func createTestPubSubServer(topicId string) (*grpc.ClientConn, *pubsub.Client) {
 	// Start a fake server running locally.
 	srv := pstest.NewServer()
-	defer srv.Close()
 	// Connect to the server without using TLS.
 	conn, _ := grpc.Dial(srv.Addr, grpc.WithInsecure())
-	defer conn.Close()
 	// Use the connection when creating a pubsub client.
 	client, _ := pubsub.NewClient(textContext, "project", option.WithGRPCConn(conn))
-	topic, _ := client.CreateTopic(textContext, "testtopic")
+	topic, _ := client.CreateTopic(textContext, topicId)
 	_ = topic
+	return conn, client
+}
+
+func TestScannerAndPublishSuccess(t *testing.T) {
+
+	conn, client := createTestPubSubServer("testtopic")
+	defer conn.Close()
 	defer client.Close()
 
 	fileProcessorStub.Client = client
@@ -60,16 +65,8 @@ func TestScannerAndPublishSuccess(t *testing.T) {
 }
 
 func TestScannerAndPublishBadTopic(t *testing.T) {
-	// Start a fake server running locally.
-	srv := pstest.NewServer()
-	defer srv.Close()
-	// Connect to the server without using TLS.
-	conn, _ := grpc.Dial(srv.Addr, grpc.WithInsecure())
+	conn, client := createTestPubSubServer("badtopic")
 	defer conn.Close()
-	// Use the connection when creating a pubsub client.
-	client, _ := pubsub.NewClient(textContext, "project", option.WithGRPCConn(conn))
-	topic, _ := client.CreateTopic(textContext, "BadTopictopic")
-	_ = topic
 	defer client.Close()
 
 	fileProcessorStub.Client = client
