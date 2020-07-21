@@ -18,8 +18,9 @@ import (
 
 func Inject() file.FileProcessor {
 	config := ConfigSetup()
-	client := NewPubSub(config)
-	fileProcessor := NewFileProcessor(config, client)
+	context := GenContext()
+	client := NewPubSub(config, context)
+	fileProcessor := NewFileProcessor(config, client, context)
 	return fileProcessor
 }
 
@@ -41,16 +42,19 @@ func ConfigSetup() config.Config {
 	return config2
 }
 
-func NewFileProcessor(config2 config.Config, client pubsub.Client) file.FileProcessor {
-	return file.FileProcessor{Config: config2, Client: client}
+func NewFileProcessor(config2 config.Config, client *pubsub.Client, ctx context.Context) file.FileProcessor {
+	return file.FileProcessor{Config: config2, Client: client, Ctx: ctx}
 }
 
-func NewPubSub(config2 config.Config) pubsub.Client {
-	ctx := context.Background()
+func GenContext() context.Context {
+	return context.Background()
+}
+
+func NewPubSub(config2 config.Config, ctx context.Context) *pubsub.Client {
 	client, err := pubsub.NewClient(ctx, config2.Pubsub.ProjectId)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	logrus.Info("Pubsub client created")
-	return *client
+	return client
 }

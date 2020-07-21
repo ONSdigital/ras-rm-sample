@@ -16,7 +16,7 @@ import (
 var FileProcessor = Inject()
 
 func Inject() file.FileProcessor{
-	wire.Build(NewFileProcessor, ConfigSetup, NewPubSub)
+	wire.Build(NewFileProcessor, ConfigSetup, GenContext, NewPubSub)
 	return file.FileProcessor{}
 }
 
@@ -34,16 +34,19 @@ func ConfigSetup() config.Config {
 	return config
 }
 
-func NewFileProcessor(config config.Config, client pubsub.Client) file.FileProcessor {
-	return file.FileProcessor{Config: config, Client: client}
+func NewFileProcessor(config config.Config, client *pubsub.Client, ctx context.Context) file.FileProcessor {
+	return file.FileProcessor{Config: config, Client: client, Ctx: ctx}
 }
 
-func NewPubSub(config config.Config) pubsub.Client {
-	ctx := context.Background()
+func GenContext() context.Context {
+	return context.Background()
+}
+
+func NewPubSub(config config.Config, ctx context.Context) *pubsub.Client {
 	client, err := pubsub.NewClient(ctx, config.Pubsub.ProjectId)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Info("Pubsub client created")
-	return *client
+	return client
 }

@@ -11,7 +11,8 @@ import (
 
 type FileProcessor struct {
 	Config config.Config
-	Client pubsub.Client
+	Client *pubsub.Client
+	Ctx context.Context
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) {
@@ -41,27 +42,27 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 func (f *FileProcessor) Publish(line string) error {
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
 
-	ctx := context.Background()
-	result := topic.Publish(ctx, &pubsub.Message{
+	result := topic.Publish(f.Ctx, &pubsub.Message{
 		Data: []byte(line),
 	})
-
-	errorChannel := make(chan error, 1)
-	go func(res *pubsub.PublishResult) {
-		// The Get method blocks until a server-generated ID or
-		// an error is returned for the published message.
-		id, err := res.Get(ctx)
-		if err != nil {
-			// Error handling code can be added here.
-			log.WithError(err).
-				Fatal("Failed to publish")
-			errorChannel <- err
-		}
-		log.WithField("line", line).
-			WithField("messageId", id).
-			Debug("published message")
-		errorChannel <- nil
-	}(result)
-
-	return <- errorChannel
+	_, err := result.Get(f.Ctx)
+	return err
+	//errorChannel := make(chan error, 1)
+	//go func(res *pubsub.PublishResult) {
+	//	// The Get method blocks until a server-generated ID or
+	//	// an error is returned for the published message.
+	//	id, err := res.Get(f.Ctx)
+	//	if err != nil {
+	//		// Error handling code can be added here.
+	//		log.WithError(err).
+	//			Fatal("Failed to publish")
+	//		errorChannel <- err
+	//	}
+	//	log.WithField("line", line).
+	//		WithField("messageId", id).
+	//		Debug("published message")
+	//	errorChannel <- nil
+	//}(result)
+	//
+	//return <- errorChannel
 }
