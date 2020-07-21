@@ -16,7 +16,7 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 	if err != nil {
 		log.WithError(err).
-			Fatal("Error retrieving the file")
+			Error("Error retrieving the file")
 		return
 	}
 	inject.FileProcessor.ChunkCsv(file, handler)
