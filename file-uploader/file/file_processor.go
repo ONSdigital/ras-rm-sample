@@ -22,16 +22,7 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 		Info("File uploaded")
 
 	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		log.WithField("line", line).
-			Debug("Publishing csv line")
-		err := f.Publish(line)
-		if err != nil {
-			log.WithField("line", line).
-				Fatal("Error publishing csv line")
-		}
-	}
+	f.Publish(scanner)
 
 	if err := scanner.Err(); err != nil {
 		log.WithError(err).
@@ -39,30 +30,34 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 	}
 }
 
-func (f *FileProcessor) Publish(line string) error {
+func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
+	var errorCount = 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		log.WithField("line", line).
+			Debug("Publishing csv line")
 
-	result := topic.Publish(f.Ctx, &pubsub.Message{
-		Data: []byte(line),
-	})
-	_, err := result.Get(f.Ctx)
-	return err
-	//errorChannel := make(chan error, 1)
-	//go func(res *pubsub.PublishResult) {
-	//	// The Get method blocks until a server-generated ID or
-	//	// an error is returned for the published message.
-	//	id, err := res.Get(f.Ctx)
-	//	if err != nil {
-	//		// Error handling code can be added here.
-	//		log.WithError(err).
-	//			Fatal("Failed to publish")
-	//		errorChannel <- err
-	//	}
-	//	log.WithField("line", line).
-	//		WithField("messageId", id).
-	//		Debug("published message")
-	//	errorChannel <- nil
-	//}(result)
-	//
-	//return <- errorChannel
+		errorChannel := make(chan error, 0)
+
+		go func(line string, topic *pubsub.Topic) {
+			result := topic.Publish(f.Ctx, &pubsub.Message{
+				Data: []byte(line),
+			})
+			id, err := result.Get(f.Ctx)
+			log.WithField("line", line).
+				WithField("messageId", id).
+				Debug("csv line acknowledged")
+			errorChannel <- err
+		}(line, topic)
+
+		err := <- errorChannel
+		if err != nil {
+			errorCount++
+			log.WithField("line", line).
+				WithError(err).
+				Error("Error publishing csv line")
+		}
+	}
+	return errorCount
 }

@@ -1,7 +1,11 @@
 package file
 
 import (
+	"bufio"
 	"context"
+	"log"
+	"os"
+
 	//"fmt"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	"testing"
@@ -25,7 +29,7 @@ var fileProcessorStub = &FileProcessor{
 
 var textContext = context.Background()
 
-func TestSendingToPubsub(t *testing.T) {
+func TestScannerAndPublishSuccess(t *testing.T) {
 	// Start a fake server running locally.
 	srv := pstest.NewServer()
 	defer srv.Close()
@@ -40,14 +44,22 @@ func TestSendingToPubsub(t *testing.T) {
 
 	fileProcessorStub.Client = client
 
-	err := fileProcessorStub.Publish("TestCSVLine")
-
+	file, err := os.Open("sample_test_file.csv")
 	if err != nil {
-		t.Errorf("Unexpected error thrown. expected: %v, actual: %v", nil, err)
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	errorCount := fileProcessorStub.Publish(scanner)
+
+	if errorCount != 0 {
+		t.Errorf("Errors have been thrown. expected: %v, actual: %v", 0, errorCount)
 	}
 }
 
-func TestSendToWrongTopicThrowsError(t *testing.T) {
+func TestScannerAndPublishBadTopic(t *testing.T) {
 	// Start a fake server running locally.
 	srv := pstest.NewServer()
 	defer srv.Close()
@@ -56,15 +68,23 @@ func TestSendToWrongTopicThrowsError(t *testing.T) {
 	defer conn.Close()
 	// Use the connection when creating a pubsub client.
 	client, _ := pubsub.NewClient(textContext, "project", option.WithGRPCConn(conn))
-	topic, _ := client.CreateTopic(textContext, "badtopic")
+	topic, _ := client.CreateTopic(textContext, "BadTopictopic")
 	_ = topic
 	defer client.Close()
 
 	fileProcessorStub.Client = client
 
-	err := fileProcessorStub.Publish("TestCSVLine")
+	file, err := os.Open("sample_test_file.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
 
-	if err == nil {
-		t.Errorf("Error expected. expected: %v, actual: %v", err, nil)
+	scanner := bufio.NewScanner(file)
+
+	errorCount := fileProcessorStub.Publish(scanner)
+
+	if errorCount != 8 {
+		t.Errorf("Invalid amount of errors thrown. expected: %v, actual: %v", 8, errorCount)
 	}
 }
