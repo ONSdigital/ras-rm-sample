@@ -95,30 +95,3 @@ func TestFileUploadSuccess(t *testing.T) {
 
 	assert.Equal(t, 202, res.Code)
 }
-
-//func TestFileUploadEmptyFileFail(t *testing.T) {
-//	path := "./empty_csv.csv"
-//	file, err := os.Open(path)
-//	if err != nil {
-//		t.Error(err)
-//	}
-//
-//	defer file.Close()
-//	body := &bytes.Buffer{}
-//	writer := multipart.NewWriter(body)
-//	part, err := writer.CreateFormFile("file", filepath.Base(path))
-//	if err != nil {
-//		writer.Close()
-//		t.Error(err)
-//	}
-//	io.Copy(part, file)
-//	writer.Close()
-//
-//	req := httptest.NewRequest("POST", "/samples/B/fileupload", body)
-//	req.Header.Set("Content-Type", writer.FormDataContentType())
-//	res := httptest.NewRecorder()
-//
-//	ProcessFile(res, req)
-//
-//	assert.Equal(t, 202, res.Code)
-//}
