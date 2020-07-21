@@ -1,4 +1,0 @@
-port: ${SERVER_PORT}
-pubsub:
-  project_id: ${PROJECT_ID}
-  topic_id: ${TOPIC_ID}

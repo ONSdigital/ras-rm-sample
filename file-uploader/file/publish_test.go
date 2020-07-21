@@ -8,23 +8,16 @@ import (
 	"google.golang.org/grpc"
 )
 
-func createTestServer() {
+func CreateTestPubsub() pubsub.Client {
 	ctx := context.Background()
 	// Start a fake server running locally.
 	srv := pstest.NewServer()
 	defer srv.Close()
 	// Connect to the server without using TLS.
-	conn, err := grpc.Dial(srv.Addr, grpc.WithInsecure())
-	if err != nil {
-		// TODO: Handle error.
-	}
+	conn, _ := grpc.Dial(srv.Addr, grpc.WithInsecure())
 	defer conn.Close()
 	// Use the connection when creating a pubsub client.
-	client, err := pubsub.NewClient(ctx, "project", option.WithGRPCConn(conn))
-	if err != nil {
-		// TODO: Handle error.
-	}
+	client, _ := pubsub.NewClient(ctx, "project", option.WithGRPCConn(conn))
 	defer client.Close()
-	_ = client
-
+	return *client
 }

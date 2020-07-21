@@ -17,9 +17,9 @@ clean:
 
 .PHONY: link
 link:
-	mkdir -p $(GOPATH)/src/github.com/ONSdigital
-	ln -sf $(shell pwd) $(GOPATH)/src/github.com/ONSdigital/
+	mkdir -p $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample
+	ln -sf $(shell pwd) $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample/
 
 .PHONY: test
 test:
-	go test -parallel=1 -race -coverprofile=coverage.txt ./...
+	go test -v -parallel=1 -race -coverprofile=coverage.txt ./...
