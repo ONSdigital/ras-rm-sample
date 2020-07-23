@@ -45,10 +45,7 @@ func TestFileUploadSuccess(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("file", filepath.Base(path))
-	if err != nil {
-		writer.Close()
-		t.Error(err)
-	}
+	assert.Nil(t, err)
 	io.Copy(part, file)
 	writer.Close()
 

@@ -3,12 +3,12 @@ package file
 import (
 	"bufio"
 	"context"
-	"log"
 	"os"
 
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 var testContext = context.Background()
@@ -33,9 +33,7 @@ func TestScannerAndPublishSuccess(t *testing.T) {
 	fileProcessorStub.Client = client
 
 	file, err := os.Open("sample_test_file.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
+	assert.Nil(t, err)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -55,9 +53,7 @@ func TestScannerAndPublishBadTopic(t *testing.T) {
 	fileProcessorStub.Client = client
 
 	file, err := os.Open("sample_test_file.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
+	assert.Nil(t, err)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
