@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        app:ras-rm-sample-csv-worker
+        app: ras-rm-sample-csv-worker
         env: {{ .Values.env }}
     spec:
       containers:
@@ -24,15 +24,15 @@ spec:
           image: "{{ .Values.image.name }}/{{ .Chart.Name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: PUBSUB_TOPIC
-              value: sample-jobs
-            - name: PUBSUB_SUB_ID
-              value: sample-workers
-            - name: SAMPLE_SERVICE_BASE_URL
-              value: {{.Values.sample.service.baseUrl}}
-            - name: SAMPLE_SERVICE_PATH
-              value: {{.Values.sample.service.path}}
-            - name: VERBOSE
-              value: {{.Values.verbose}}
+          - name: PUBSUB_TOPIC
+            value: sample-jobs
+          - name: PUBSUB_SUB_ID
+            value: sample-workers
+          - name: SAMPLE_SERVICE_BASE_URL
+            value: {{.Values.sample.service.baseUrl}}
+          - name: SAMPLE_SERVICE_PATH
+            value: {{.Values.sample.service.path}}
+          - name: VERBOSE
+            value: {{.Values.verbose | quote }}
           resources:
             {{ toYaml .Values.resources | nindent 12 }}
