@@ -37,9 +37,7 @@ func TestFileUploadSuccess(t *testing.T) {
 	inject.FileProcessor = fileProcessorStub
 	path := "../file/sample_test_file.csv"
 	file, err := os.Open(path)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Nil(t, err)
 
 	defer file.Close()
 	body := &bytes.Buffer{}
