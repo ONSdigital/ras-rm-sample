@@ -31,7 +31,10 @@ jobs:
 
       - name: Run Tests
         run: |
+          cd file-uploader
           make test
+        env:
+          GOPATH: /home/runner/work/ras-rm-sample/go
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
@@ -55,6 +58,8 @@ jobs:
           cd file-uploader
           make
           docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} . && cd ..
+        env:
+          GOPATH: /home/runner/work/ras-rm-sample/go
       - name: Publish Docker Image
         if: github.ref != 'refs/heads/master'
         run: |
@@ -119,6 +124,8 @@ jobs:
           cd file-uploader
           make
           docker build -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }} . && cd ..
+        env:
+          GOPATH: /home/runner/work/ras-rm-sample/go
       - name: Push Release image
         if: github.ref == 'refs/heads/master'
         run: |
