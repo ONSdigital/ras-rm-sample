@@ -21,9 +21,9 @@ func Inject() file.FileProcessor{
 }
 
 func ConfigSetup() config.Config {
-	viper.BindEnv("PORT", "8080")
-	viper.BindEnv("PROJECT_ID", "rm-ras-sandbox")
-	viper.BindEnv("TOPIC_ID", "topic")
+	viper.SetDefault("PORT", "8080")
+	viper.SetDefault("PROJECT_ID", "rm-ras-sandbox")
+	viper.SetDefault("TOPIC_ID", "topic")
 	config := config.Config{
 		Port: viper.GetString("PORT"),
 		Pubsub: config.Pubsub{
