@@ -3,8 +3,12 @@ name: CI
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'worker/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'worker/**'
 
 env:
   IMAGE: ras-rm-sample
