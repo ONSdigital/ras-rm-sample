@@ -27,12 +27,10 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
 	var errorCount = 0
-	var lineCount = 0
 	var wg sync.WaitGroup
 	var mux sync.Mutex
 	for scanner.Scan() {
 		line := scanner.Text()
-		lineCount++
 		log.WithField("line", line).
 			Debug("Publishing csv line")
 
