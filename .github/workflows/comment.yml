@@ -21,7 +21,7 @@ jobs:
         run: |
           echo NAMESPACE=$(echo $COMMENT_BODY | cut -d' ' -f2) >> $GITHUB_ENV
 
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - uses: google-github-actions/setup-gcloud@master
         with:
           version: '270.0.0'
           service_account_key: ${{ secrets.GCR_KEY }}
